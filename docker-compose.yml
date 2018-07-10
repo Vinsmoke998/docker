@@ -1,0 +1,46 @@
+version: '2'
+services: 
+  web:
+      container_name: docker-nginx-latest
+      image: nginx:latest
+      restart: always
+      ports:
+          - "8088:80"
+      volumes:
+          - ./code:/var/www
+          - ./conf.d/site.conf:/etc/nginx/conf.d/site.conf
+      links:
+          - php
+          - mysql
+          - redis
+  php:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: docker-php7.0
+      restart: always
+      image: php:7.1-fpm
+      volumes:
+          - ./code:/var/www
+          - ./php/php.ini:/etc/php/7.1/fpm/php.ini
+      links: 
+          - mysql
+  mysql: 
+      container_name: docker-mysql
+      image: mysql:5.6.26
+      ports: 
+        - "3308:3306"
+      restart: always
+      environment:
+        - MYSQL_ROOT_PASSWORD=123456
+      volumes:
+        - ./mysql:/var/lib/mysql
+  redis:
+      container_name: docker-redis
+      image: redis
+      restart: always
+      environment:
+        - ALLOW_EMPTY_PASSWORD=yes
+      ports: 
+        - '6339:6336'
+   
